@@ -1,0 +1,10 @@
+spacy==3.7.2
+transformers==4.35.2
+torch==2.1.1
+
+
+# run these before running the script
+# pip install -r requirements.txt
+
+#                 model
+# python -m spacy download en_core_web_sm
