@@ -1,0 +1,46 @@
+{
+    "timestamp_utc": "2025-10-03T18:10:34.927600Z",
+    "toxicity_analysis": {
+        "label": "toxic",
+        "confidence_score": 0.519
+    },
+    "main_sentence": "They should not be allowed to live near hindu because they always cause trouble.",
+    "keywords": [
+        {
+            "term": "muslim",
+            "count": 2
+        },
+        {
+            "term": "they",
+            "count": 2
+        },
+        {
+            "term": "people",
+            "count": 1
+        },
+        {
+            "term": "hindu",
+            "count": 1
+        },
+        {
+            "term": "trouble",
+            "count": 1
+        },
+        {
+            "term": "world",
+            "count": 1
+        },
+        {
+            "term": "we",
+            "count": 1
+        },
+        {
+            "term": "them",
+            "count": 1
+        },
+        {
+            "term": "our communities",
+            "count": 1
+        }
+    ]
+}
