@@ -1,7 +1,7 @@
 # Blockchain Intelligence Sharing Module
 
 A decentralized, tamper-proof threat intelligence sharing system built using **Ethereum**, **Hardhat**, and **FastAPI**.
-It enables secure, transparent, and immutable cross-organization intelligence sharing as part of the **SIH25161 AI-Powered Threat Detection System**.
+It enables secure, transparent, and immutable cross-organization intelligence sharing as part of the **AI-Powered Threat Detection System**.
 
 ---
 
