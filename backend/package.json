@@ -1,0 +1,25 @@
+{
+    "name": "ai-threat-detection-backend",
+    "version": "1.0.0",
+    "description": "Main API server for the AI threat detection and intelligence sharing platform.",
+    "main": "src/server.js",
+    "type": "module",
+    "scripts": {
+      "start": "node src/server.js",
+      "dev": "nodemon src/server.js"
+    },
+    "author": "SIH Team",
+    "license": "ISC",
+    "dependencies": {
+      "axios": "^1.7.2",
+      "cloudinary": "^2.2.0",
+      "cors": "^2.8.5",
+      "dotenv": "^16.4.5",
+      "express": "^4.19.2",
+      "mongoose": "^8.4.0",
+      "multer": "^1.4.5-lts.1"
+    },
+    "devDependencies": {
+      "nodemon": "^3.1.0"
+    }
+  }
