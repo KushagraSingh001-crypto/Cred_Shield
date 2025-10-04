@@ -8,37 +8,50 @@ from transformers import pipeline
 
 # --- Configuration ---
 INPUT_FILENAME = "input.txt"
-OUTPUT_FILENAME = "keywords_output.json" 
+OUTPUT_FILENAME = "keywords_output.json"
 
 # --- Model Loading ---
-# Load the spaCy model for keyword/sentence extraction
 try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
     print(f"Spacy model not found. Please run: python -m spacy download en_core_web_sm")
     nlp = None
 
-# Load the pre-trained model for toxicity detection
-# This will download the model the first time you run it
 print("Loading toxicity detection model...")
 toxicity_pipeline = pipeline("text-classification", model="unitary/toxic-bert")
+
+print("Loading AI detection model...")
+ai_detector = pipeline("text-classification", model="Hello-SimpleAI/chatgpt-detector-roberta")
+# Fallback option (uncomment if needed):
+# ai_detector = pipeline("text-classification", model="roberta-base-openai-detector")
 print("Models loaded successfully.")
 
 
 def analyze_text(paragraph: str):
-    """
-    Analyzes a paragraph for its main sentence, keywords, and toxicity.
-    """
     if not nlp:
-        return None, None, None
+        return None, None, None, None
 
-    # --- 1. Toxicity Analysis (NEW) ---
-    toxicity_results = toxicity_pipeline(paragraph)[0] # Get the top result
-    
-    # --- 2. Main Sentence & Keyword Extraction ---
+    # --- 1. Toxicity Analysis ---
+    toxicity_results = toxicity_pipeline(paragraph)[0]
+
+    # --- 2. AI Detection ---
+    ai_results = ai_detector(paragraph)[0]
+    print(f"Raw AI detection result: {ai_results}")  # Log for debugging
+
+    # Updated: Handle labels for Hello-SimpleAI/chatgpt-detector-roberta and fallback model
+    if ai_results["label"] in ["ChatGPT", "LABEL_1"]:  # ChatGPT for new model, LABEL_1 for old
+        is_ai_generated = True
+        ai_confidence = ai_results["score"]
+    elif ai_results["label"] in ["Human", "LABEL_0"]:  # Human for new model, LABEL_0 for old
+        is_ai_generated = False
+        ai_confidence = 1 - ai_results["score"]  # Adjust to AI probability
+    else:
+        print(f"Warning: Unexpected label '{ai_results['label']}' from AI detector. Treating as human-written.")
+        is_ai_generated = False
+        ai_confidence = 1 - ai_results["score"]  # Fallback to avoid crashes
+
+    # --- 3. Main Sentence & Keyword Extraction ---
     doc = nlp(paragraph)
-    
-    # Keyword Extraction
     keywords = []
     for ent in doc.ents:
         if ent.label_ in ["PERSON", "ORG", "GPE", "LOC", "PRODUCT", "EVENT"]:
@@ -48,17 +61,16 @@ def analyze_text(paragraph: str):
         keywords.append(cleaned_chunk)
     keyword_counts = Counter(keywords)
 
-    # Main Sentence Extraction
     word_frequencies = {}
     for word in doc:
         if word.text.lower() not in nlp.Defaults.stop_words and word.text.lower() not in punctuation:
             word_frequencies.setdefault(word.text, 0)
             word_frequencies[word.text] += 1
-    
+
     max_frequency = max(word_frequencies.values()) if word_frequencies else 1
     for word in word_frequencies.keys():
         word_frequencies[word] = (word_frequencies[word] / max_frequency)
-        
+
     sentence_scores = {}
     for sent in doc.sents:
         for word in sent:
@@ -68,7 +80,10 @@ def analyze_text(paragraph: str):
 
     main_sentence = max(sentence_scores, key=sentence_scores.get) if sentence_scores else None
 
-    return main_sentence.text if main_sentence else None, keyword_counts, toxicity_results
+    return main_sentence.text if main_sentence else None, keyword_counts, toxicity_results, {
+        "is_ai_generated": is_ai_generated,
+        "ai_confidence_score": round(ai_confidence, 4)
+    }
 
 # --- Main Execution Block ---
 if __name__ == "__main__":
@@ -77,14 +92,15 @@ if __name__ == "__main__":
             paragraph_to_analyze = f.read()
         print(f"Successfully read data from '{INPUT_FILENAME}'. Analyzing...")
 
-        main_sentence, extracted_keywords, toxicity = analyze_text(paragraph_to_analyze)
+        main_sentence, extracted_keywords, toxicity, ai_detection = analyze_text(paragraph_to_analyze)
 
-        if main_sentence and extracted_keywords and toxicity:
-            # Build the structured JSON output
+        if main_sentence and extracted_keywords and toxicity and ai_detection:
             keyword_list = [{"term": term, "count": count} for term, count in extracted_keywords.most_common()]
-            
+
             output_data = {
                 "timestamp_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                "is_ai_generated": ai_detection["is_ai_generated"],
+                "ai_confidence_score": ai_detection["ai_confidence_score"],
                 "toxicity_analysis": {
                     "label": toxicity['label'],
                     "confidence_score": round(toxicity['score'], 4)
@@ -93,19 +109,17 @@ if __name__ == "__main__":
                 "keywords": keyword_list
             }
 
-            # Save the dictionary as a formatted JSON file
             with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f_out:
                 json.dump(output_data, f_out, indent=4)
-            
+
             print(f"✅ Success! Full analysis saved to '{OUTPUT_FILENAME}'")
         else:
-             print("Could not complete the analysis.")
+            print("Could not complete the analysis.")
 
     except FileNotFoundError:
         print(f"❌ Error: Please create a file named '{INPUT_FILENAME}' and add your text.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-
 
 
 
@@ -122,7 +136,7 @@ if __name__ == "__main__":
 
 # # --- Configuration ---
 # INPUT_FILENAME = "input.txt"
-# OUTPUT_FILENAME = "keywords_output.json" 
+# OUTPUT_FILENAME = "keywords_output.json"
 
 # # --- Model Loading ---
 # # Load the spaCy model for keyword/sentence extraction
@@ -133,45 +147,25 @@ if __name__ == "__main__":
 #     nlp = None
 
 # # Load the pre-trained model for toxicity detection
+# # This will download the model the first time you run it
 # print("Loading toxicity detection model...")
 # toxicity_pipeline = pipeline("text-classification", model="unitary/toxic-bert")
-
-# # Load the pre-trained model for AI-generated text detection
-# print("Loading AI-generated text detection model...")
-# ai_detector_pipeline = pipeline("text-classification", model="Hello-SimpleAI/chatgpt-detector-roberta")
 # print("Models loaded successfully.")
 
-# def detect_ai_generated(paragraph: str) -> tuple[bool, float]:
-#     """
-#     Detects if text is AI-generated using a pre-trained RoBERTa model.
-#     Returns a tuple of (is_ai_generated: bool, confidence_score: float).
-#     """
-#     if not nlp:
-#         return False, 0.0
-
-#     # Use the AI detection model
-#     result = ai_detector_pipeline(paragraph)[0]
-#     # Model outputs "Generated" for AI-generated, "Real" for human-written
-#     is_ai_generated = result["label"] == "Generated"
-#     confidence_score = result["score"]
-#     return is_ai_generated, confidence_score
 
 # def analyze_text(paragraph: str):
 #     """
-#     Analyzes a paragraph for its main sentence, keywords, toxicity, and AI-generated status.
+#     Analyzes a paragraph for its main sentence, keywords, and toxicity.
 #     """
 #     if not nlp:
-#         return None, None, None, None, None
+#         return None, None, None
 
-#     # --- 1. AI-Generated Text Detection ---
-#     is_ai_generated, ai_confidence = detect_ai_generated(paragraph)
-    
-#     # --- 2. Toxicity Analysis (always performed) ---
-#     toxicity_results = toxicity_pipeline(paragraph)[0]
-    
-#     # --- 3. Main Sentence & Keyword Extraction ---
+#     # --- 1. Toxicity Analysis (NEW) ---
+#     toxicity_results = toxicity_pipeline(paragraph)[0] # Get the top result
+
+#     # --- 2. Main Sentence & Keyword Extraction ---
 #     doc = nlp(paragraph)
-    
+
 #     # Keyword Extraction
 #     keywords = []
 #     for ent in doc.ents:
@@ -188,11 +182,11 @@ if __name__ == "__main__":
 #         if word.text.lower() not in nlp.Defaults.stop_words and word.text.lower() not in punctuation:
 #             word_frequencies.setdefault(word.text, 0)
 #             word_frequencies[word.text] += 1
-    
+
 #     max_frequency = max(word_frequencies.values()) if word_frequencies else 1
 #     for word in word_frequencies.keys():
 #         word_frequencies[word] = (word_frequencies[word] / max_frequency)
-        
+
 #     sentence_scores = {}
 #     for sent in doc.sents:
 #         for word in sent:
@@ -202,7 +196,7 @@ if __name__ == "__main__":
 
 #     main_sentence = max(sentence_scores, key=sentence_scores.get) if sentence_scores else None
 
-#     return main_sentence.text if main_sentence else None, keyword_counts, toxicity_results, is_ai_generated, ai_confidence
+#     return main_sentence.text if main_sentence else None, keyword_counts, toxicity_results
 
 # # --- Main Execution Block ---
 # if __name__ == "__main__":
@@ -211,16 +205,14 @@ if __name__ == "__main__":
 #             paragraph_to_analyze = f.read()
 #         print(f"Successfully read data from '{INPUT_FILENAME}'. Analyzing...")
 
-#         main_sentence, extracted_keywords, toxicity, is_ai_generated, ai_confidence = analyze_text(paragraph_to_analyze)
+#         main_sentence, extracted_keywords, toxicity = analyze_text(paragraph_to_analyze)
 
-#         if main_sentence and extracted_keywords:
+#         if main_sentence and extracted_keywords and toxicity:
 #             # Build the structured JSON output
 #             keyword_list = [{"term": term, "count": count} for term, count in extracted_keywords.most_common()]
-            
+
 #             output_data = {
 #                 "timestamp_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-#                 "is_ai_generated": is_ai_generated,
-#                 "ai_confidence_score": round(ai_confidence, 4),
 #                 "toxicity_analysis": {
 #                     "label": toxicity['label'],
 #                     "confidence_score": round(toxicity['score'], 4)
@@ -232,15 +224,18 @@ if __name__ == "__main__":
 #             # Save the dictionary as a formatted JSON file
 #             with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f_out:
 #                 json.dump(output_data, f_out, indent=4)
-            
+
 #             print(f"✅ Success! Full analysis saved to '{OUTPUT_FILENAME}'")
 #         else:
-#             print("Could not complete the analysis.")
+#              print("Could not complete the analysis.")
 
 #     except FileNotFoundError:
 #         print(f"❌ Error: Please create a file named '{INPUT_FILENAME}' and add your text.")
 #     except Exception as e:
 #         print(f"An unexpected error occurred: {e}")
+
+
+
 
 
 # import spacy
@@ -255,7 +250,7 @@ if __name__ == "__main__":
 
 # # --- Configuration ---
 # INPUT_FILENAME = "input.txt"
-# OUTPUT_FILENAME = "keywords_output.json" 
+# OUTPUT_FILENAME = "keywords_output.json"
 
 # # --- Model Loading ---
 # try:
@@ -318,7 +313,7 @@ if __name__ == "__main__":
 
 #     # --- 1. AI-Generated Text Detection ---
 #     is_ai_generated, ai_confidence = detect_ai_generated(paragraph)
-    
+
 #     # --- 2. Sentiment/Toxicity Analysis ---
 #     sentiment_results = sentiment_pipeline(paragraph, truncation=True, max_length=512)[0]
 #     # Map sentiment to toxicity (1-2 stars: toxic, 3-5 stars: non-toxic)
@@ -326,10 +321,10 @@ if __name__ == "__main__":
 #     toxicity_label = "toxic" if sentiment_score <= 2 else "non-toxic"
 #     toxicity_confidence = sentiment_results["score"]
 #     print(f"DEBUG: Sentiment - Label: {sentiment_results['label']}, Confidence: {toxicity_confidence:.4f}, Toxicity: {toxicity_label}")
-    
+
 #     # --- 3. Main Sentence & Keyword Extraction ---
 #     doc = nlp(paragraph)
-    
+
 #     # Keyword Extraction
 #     keywords = []
 #     for ent in doc.ents:
@@ -346,11 +341,11 @@ if __name__ == "__main__":
 #         if word.text.lower() not in nlp.Defaults.stop_words and word.text.lower() not in punctuation:
 #             word_frequencies.setdefault(word.text, 0)
 #             word_frequencies[word.text] += 1
-    
+
 #     max_frequency = max(word_frequencies.values()) if word_frequencies else 1
 #     for word in word_frequencies.keys():
 #         word_frequencies[word] = (word_frequencies[word] / max_frequency)
-        
+
 #     sentence_scores = {}
 #     for sent in doc.sents:
 #         for word in sent:
@@ -377,7 +372,7 @@ if __name__ == "__main__":
 #         if main_sentence and extracted_keywords:
 #             # Build the structured JSON output
 #             keyword_list = [{"term": term, "count": count} for term, count in extracted_keywords.most_common()]
-            
+
 #             output_data = {
 #                 "timestamp_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
 #                 "is_ai_generated": is_ai_generated,
@@ -393,7 +388,7 @@ if __name__ == "__main__":
 #             # Save the dictionary as a formatted JSON file
 #             with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f_out:
 #                 json.dump(output_data, f_out, indent=4)
-            
+
 #             print(f"✅ Success! Full analysis saved to '{OUTPUT_FILENAME}'")
 #         else:
 #             print("Could not complete the analysis.")
@@ -402,4 +397,3 @@ if __name__ == "__main__":
 #         print(f"❌ Error: Please create a file named '{INPUT_FILENAME}' and add your text.")
 #     except Exception as e:
 #         print(f"An unexpected error occurred: {e}")
-

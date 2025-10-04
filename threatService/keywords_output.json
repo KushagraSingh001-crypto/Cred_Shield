@@ -1,121 +1,19 @@
 {
-    "timestamp_utc": "2025-10-04T07:21:11.706341Z",
+    "timestamp_utc": "2025-10-04T11:11:31.023890Z",
+    "is_ai_generated": false,
+    "ai_confidence_score": 0.0003,
     "toxicity_analysis": {
         "label": "toxic",
-        "confidence_score": 0.0006
+        "confidence_score": 0.076
     },
-    "main_sentence": "Every street hummed with life\u2014merchants calling out, children laughing, and the soft clink of glasses in cozy taverns.",
+    "main_sentence": "hi i am adolf hitler\n",
     "keywords": [
         {
-            "term": "city",
+            "term": "i",
             "count": 1
         },
         {
-            "term": "twilight sky",
-            "count": 1
-        },
-        {
-            "term": "its spires",
-            "count": 1
-        },
-        {
-            "term": "cascade",
-            "count": 1
-        },
-        {
-            "term": "colors",
-            "count": 1
-        },
-        {
-            "term": "setting sun",
-            "count": 1
-        },
-        {
-            "term": "every street",
-            "count": 1
-        },
-        {
-            "term": "life",
-            "count": 1
-        },
-        {
-            "term": "merchants",
-            "count": 1
-        },
-        {
-            "term": "children",
-            "count": 1
-        },
-        {
-            "term": "soft clink",
-            "count": 1
-        },
-        {
-            "term": "glasses",
-            "count": 1
-        },
-        {
-            "term": "cozy taverns",
-            "count": 1
-        },
-        {
-            "term": "gentle breeze",
-            "count": 1
-        },
-        {
-            "term": "scent",
-            "count": 1
-        },
-        {
-            "term": "jasmine",
-            "count": 1
-        },
-        {
-            "term": "bustling crowds",
-            "count": 1
-        },
-        {
-            "term": "promise",
-            "count": 1
-        },
-        {
-            "term": "serenity",
-            "count": 1
-        },
-        {
-            "term": "this vibrant tapestry",
-            "count": 1
-        },
-        {
-            "term": "every soul",
-            "count": 1
-        },
-        {
-            "term": "part",
-            "count": 1
-        },
-        {
-            "term": "story",
-            "count": 1
-        },
-        {
-            "term": "that",
-            "count": 1
-        },
-        {
-            "term": "generations",
-            "count": 1
-        },
-        {
-            "term": "timeless ode",
-            "count": 1
-        },
-        {
-            "term": "human spirit",
-            "count": 1
-        },
-        {
-            "term": "unity",
+            "term": "adolf hitler",
             "count": 1
         }
     ]
