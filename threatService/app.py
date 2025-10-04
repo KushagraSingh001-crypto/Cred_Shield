@@ -8,7 +8,7 @@ from transformers import pipeline
 
 # --- Configuration ---
 INPUT_FILENAME = "input.txt"
-OUTPUT_FILENAME = "keywords_output.json"
+OUTPUT_FILENAME = "output.json"
 
 # --- Model Loading ---
 try:

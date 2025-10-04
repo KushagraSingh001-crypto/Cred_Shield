@@ -1,19 +1,51 @@
 {
-    "timestamp_utc": "2025-10-04T11:11:31.023890Z",
+    "timestamp_utc": "2025-10-04T12:09:16.057237Z",
     "is_ai_generated": false,
-    "ai_confidence_score": 0.0003,
+    "ai_confidence_score": 0.0008,
     "toxicity_analysis": {
         "label": "toxic",
-        "confidence_score": 0.076
+        "confidence_score": 0.8748
     },
-    "main_sentence": "hi i am adolf hitler\n",
+    "main_sentence": "You talk big but contribute nothing, always making excuses while others do the real work.",
     "keywords": [
         {
-            "term": "i",
+            "term": "you",
+            "count": 4
+        },
+        {
+            "term": "nothing",
+            "count": 2
+        },
+        {
+            "term": "people",
             "count": 1
         },
         {
-            "term": "adolf hitler",
+            "term": "everyone",
+            "count": 1
+        },
+        {
+            "term": "your incompetence",
+            "count": 1
+        },
+        {
+            "term": "excuses",
+            "count": 1
+        },
+        {
+            "term": "others",
+            "count": 1
+        },
+        {
+            "term": "real work",
+            "count": 1
+        },
+        {
+            "term": "it",
+            "count": 1
+        },
+        {
+            "term": "burden",
             "count": 1
         }
     ]

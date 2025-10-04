@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Analysis Dashboard</title>
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Text Analysis Dashboard</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- AI Confidence Chart -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">AI-Generated Probability</h2>
+                <div id="aiChart"></div>
+            </div>
+            <!-- Toxicity Chart -->
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Toxicity Probability</h2>
+                <div id="toxicityChart"></div>
+            </div>
+        </div>
+        <!-- Text Outputs -->
+        <div class="bg-white p-4 rounded-lg shadow mt-4">
+            <h2 class="text-xl font-semibold mb-2">Analysis Details</h2>
+            <p><strong>Main Sentence:</strong> <span id="mainSentence"></span></p>
+            <p><strong>Top Keywords:</strong> <span id="keywords"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and process JSON data
+        fetch('output.json')
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to load JSON');
+                return response.json();
+            })
+            .then(data => {
+                // AI Confidence Chart
+                const aiTrace = {
+                    x: ['AI-Generated', 'Human-Written'],
+                    y: [data.ai_confidence_score, 1 - data.ai_confidence_score],
+                    type: 'bar',
+                    marker: {
+                        color: ['#FF6B6B', '#4ECDC4']
+                    },
+                    text: [data.ai_confidence_score.toFixed(4), (1 - data.ai_confidence_score).toFixed(4)],
+                    textposition: 'auto'
+                };
+                const aiLayout = {
+                    title: { text: `AI-Generated: ${data.is_ai_generated ? 'Yes' : 'No'}`, font: { size: 16 } },
+                    yaxis: { title: 'Probability', range: [0, 1] },
+                    height: 300,
+                    margin: { t: 50, b: 50, l: 50, r: 50 }
+                };
+                Plotly.newPlot('aiChart', [aiTrace], aiLayout);
+
+                // Toxicity Chart
+                const toxicityTrace = {
+                    x: ['Toxic', 'Non-Toxic'],
+                    y: [data.toxicity_analysis.confidence_score, 1 - data.toxicity_analysis.confidence_score],
+                    type: 'bar',
+                    marker: {
+                        color: ['#FF6B6B', '#4ECDC4']
+                    },
+                    text: [data.toxicity_analysis.confidence_score.toFixed(4), (1 - data.toxicity_analysis.confidence_score).toFixed(4)],
+                    textposition: 'auto'
+                };
+                const toxicityLayout = {
+                    title: { text: `Toxicity: ${data.toxicity_analysis.label}`, font: { size: 16 } },
+                    yaxis: { title: 'Probability', range: [0, 1] },
+                    height: 300,
+                    margin: { t: 50, b: 50, l: 50, r: 50 }
+                };
+                Plotly.newPlot('toxicityChart', [toxicityTrace], toxicityLayout);
+
+                // Display Main Sentence and Keywords
+                document.getElementById('mainSentence').textContent = data.main_sentence;
+                const topKeywords = data.keywords.slice(0, 5).map(k => `${k.term} (${k.count})`).join(', ');
+                document.getElementById('keywords').textContent = topKeywords || 'None';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.body.innerHTML += '<p class="text-red-500 text-center">Error loading data. Please ensure keywords_output.json exists.</p>';
+            });
+    </script>
+</body>
+</html>
