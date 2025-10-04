@@ -1,11 +1,15 @@
 spacy==3.7.2
-transformers==4.35.2
-torch==2.1.1
-nltk==3.8.1
+transformers==4.36.2
+torch>=2.0.0
+tokenizers>=0.14.0
+numpy
+regex
+
 
 
 # run these before running the script
 # pip install -r requirements.txt
 
 #                 model
+
 # pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
