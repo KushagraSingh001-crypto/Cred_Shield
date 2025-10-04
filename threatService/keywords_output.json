@@ -1,45 +1,121 @@
 {
-    "timestamp_utc": "2025-10-03T18:10:34.927600Z",
+    "timestamp_utc": "2025-10-04T07:21:11.706341Z",
     "toxicity_analysis": {
         "label": "toxic",
-        "confidence_score": 0.519
+        "confidence_score": 0.0006
     },
-    "main_sentence": "They should not be allowed to live near hindu because they always cause trouble.",
+    "main_sentence": "Every street hummed with life\u2014merchants calling out, children laughing, and the soft clink of glasses in cozy taverns.",
     "keywords": [
         {
-            "term": "muslim",
-            "count": 2
-        },
-        {
-            "term": "they",
-            "count": 2
-        },
-        {
-            "term": "people",
+            "term": "city",
             "count": 1
         },
         {
-            "term": "hindu",
+            "term": "twilight sky",
             "count": 1
         },
         {
-            "term": "trouble",
+            "term": "its spires",
             "count": 1
         },
         {
-            "term": "world",
+            "term": "cascade",
             "count": 1
         },
         {
-            "term": "we",
+            "term": "colors",
             "count": 1
         },
         {
-            "term": "them",
+            "term": "setting sun",
             "count": 1
         },
         {
-            "term": "our communities",
+            "term": "every street",
+            "count": 1
+        },
+        {
+            "term": "life",
+            "count": 1
+        },
+        {
+            "term": "merchants",
+            "count": 1
+        },
+        {
+            "term": "children",
+            "count": 1
+        },
+        {
+            "term": "soft clink",
+            "count": 1
+        },
+        {
+            "term": "glasses",
+            "count": 1
+        },
+        {
+            "term": "cozy taverns",
+            "count": 1
+        },
+        {
+            "term": "gentle breeze",
+            "count": 1
+        },
+        {
+            "term": "scent",
+            "count": 1
+        },
+        {
+            "term": "jasmine",
+            "count": 1
+        },
+        {
+            "term": "bustling crowds",
+            "count": 1
+        },
+        {
+            "term": "promise",
+            "count": 1
+        },
+        {
+            "term": "serenity",
+            "count": 1
+        },
+        {
+            "term": "this vibrant tapestry",
+            "count": 1
+        },
+        {
+            "term": "every soul",
+            "count": 1
+        },
+        {
+            "term": "part",
+            "count": 1
+        },
+        {
+            "term": "story",
+            "count": 1
+        },
+        {
+            "term": "that",
+            "count": 1
+        },
+        {
+            "term": "generations",
+            "count": 1
+        },
+        {
+            "term": "timeless ode",
+            "count": 1
+        },
+        {
+            "term": "human spirit",
+            "count": 1
+        },
+        {
+            "term": "unity",
             "count": 1
         }
     ]
